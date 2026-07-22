@@ -14,6 +14,11 @@ body{background:var(--bg);color:var(--t);font-family:'Poppins',sans-serif;paddin
 .act-bar{display:flex;gap:8px;margin-bottom:14px}
 .act-btn{font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;padding:7px 14px;border-radius:8px;border:1.5px solid var(--b);background:var(--w);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .act-btn.pri{background:var(--t);border-color:var(--t);color:#fff}
+.drop{position:relative;display:inline-block}
+.drop-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;background:var(--w);border:1.5px solid var(--b);border-radius:8px;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:100;overflow:hidden}
+.drop-menu.on{display:block}
+.drop-item{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Poppins',sans-serif;white-space:nowrap}
+.drop-item:hover{background:var(--bs)}
 /* View toggle */
 .view-rep{display:none}.view-rep.on{display:block}
 /* Dashboard */
@@ -143,6 +148,14 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
 
 <div class="act-bar">
   <button class="act-btn pri" id="btnRep">📄 Ver relatório por escrito</button>
+  <button class="act-btn" id="btnDl">📥 Baixar PDF</button>
+  <div class="drop" id="dropShare">
+    <button class="act-btn" id="btnShare">📤 Compartilhar ▾</button>
+    <div class="drop-menu" id="shareMenu">
+      <button class="drop-item" id="shareWA">💬 WhatsApp</button>
+      <button class="drop-item" id="shareEmail">✉️ E-mail</button>
+    </div>
+  </div>
 </div>
 
 <div id="viewDash">
@@ -207,7 +220,14 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
     <div id="repContent"></div>
     <div class="rep-pbar">
       <button class="act-btn" id="btnBack">← Voltar ao dashboard</button>
-      <button class="act-btn pri" id="btnPrint">🖨️ Imprimir / Salvar PDF</button>
+      <button class="act-btn pri" id="btnDlRep">📥 Baixar PDF</button>
+      <div class="drop" id="dropShareRep">
+        <button class="act-btn" id="btnShareRep">📤 Compartilhar ▾</button>
+        <div class="drop-menu" id="shareMenuRep">
+          <button class="drop-item" id="shareWARep">💬 WhatsApp</button>
+          <button class="drop-item" id="shareEmailRep">✉️ E-mail</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -215,7 +235,7 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
 </div>
 <script>
 const _D={
-  meta:{cliente:'Guará Acqua Park',periodo:'01 Jul 2026 – 21 Jul 2026',conta:'2910104516566',gestor:'Pedro Silva',gerado:'22/07/2026'},
+  meta:{cliente:'Guará Acqua Park',periodo:'01 Jul 2026 – 21 Jul 2026',conta:'2910104516566',gestor:'Pedro Silva',gerado:'22/07/2026',link:'https://pedro-s-developer.github.io/dashboard-guara/'},
   insight:{
     txt:'Em 21 dias, <span class="ins-hl">R$ 19.077 investidos</span> geraram <span class="ins-hl">R$ 154.746 em receita</span> — ROAS de <span class="ins-hl">19,90x</span> nas campanhas de venda. Mais de <span class="ins-hl">3.726 conversas</span> abertas no WhatsApp e <span class="ins-hl">21.140 visitas</span> qualificadas ao site.',
     stats:[['Receita Atribuída','R$ 154.746'],['ROAS (Vendas)','19,90x'],['Conversas MSG','3.726']]
@@ -414,7 +434,30 @@ if(_D.relatorio)document.getElementById('repContent').innerHTML=_D.relatorio;
 window.onbeforeprint=function(){vr.classList.add('on');};
 document.getElementById('btnRep').addEventListener('click',function(){vd.style.display='none';vr.classList.add('on');});
 document.getElementById('btnBack').addEventListener('click',function(){vd.style.display='';vr.classList.remove('on');});
-document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+
+// PDF + Share
+var _sl=(_D.meta.link&&_D.meta.link!=='')?_D.meta.link:window.location.href;
+var _st=_D.meta.cliente+' — Relatório '+_D.meta.periodo;
+function _print(){vr.classList.add('on');window.print();}
+function _wa(){window.open('https://wa.me/?text='+encodeURIComponent(_st+'\n'+_sl));}
+function _email(){window.open('mailto:?subject='+encodeURIComponent(_st)+'&body='+encodeURIComponent('Acesse o relatório:\n'+_sl));}
+function _share(menu){
+  if(navigator.share){navigator.share({title:_st,url:_sl}).catch(function(){});}
+  else{menu.classList.toggle('on');}
+}
+document.addEventListener('click',function(e){
+  var ds=document.getElementById('dropShare'),dr=document.getElementById('dropShareRep');
+  if(ds&&!ds.contains(e.target))document.getElementById('shareMenu').classList.remove('on');
+  if(dr&&!dr.contains(e.target))document.getElementById('shareMenuRep').classList.remove('on');
+});
+document.getElementById('btnDl').addEventListener('click',_print);
+document.getElementById('btnDlRep').addEventListener('click',_print);
+document.getElementById('btnShare').addEventListener('click',function(){_share(document.getElementById('shareMenu'));});
+document.getElementById('btnShareRep').addEventListener('click',function(){_share(document.getElementById('shareMenuRep'));});
+document.getElementById('shareWA').addEventListener('click',_wa);
+document.getElementById('shareEmail').addEventListener('click',_email);
+document.getElementById('shareWARep').addEventListener('click',_wa);
+document.getElementById('shareEmailRep').addEventListener('click',_email);
 </script>
 </body>
 </html>
