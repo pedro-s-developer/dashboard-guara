@@ -10,6 +10,13 @@
 :root{--bg:#F7F8FA;--w:#FFF;--b:#D8DEE9;--bs:#EEF1F6;--t:#0F1724;--t2:#2D3A4E;--t3:#56657A;--t4:#8899AA;--blue:#1877F2;--blu:#EAF1FF;--grn:#00934a;--grb:#E6F5EE;--ylw:#E08C00;--ylb:#FFF6E0;--tel:#0077A8;--tlb:#E0F4FA;--pur:#7B2FBE;--pub:#F3EAFF;}
 body{background:var(--bg);color:var(--t);font-family:'Poppins',sans-serif;padding:16px 14px}
 .pg{max-width:1180px;margin:0 auto}
+/* Action bar */
+.act-bar{display:flex;gap:8px;margin-bottom:14px}
+.act-btn{font-family:'Poppins',sans-serif;font-size:11px;font-weight:700;padding:7px 14px;border-radius:8px;border:1.5px solid var(--b);background:var(--w);color:var(--t2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.act-btn.pri{background:var(--t);border-color:var(--t);color:#fff}
+/* View toggle */
+.view-rep{display:none}.view-rep.on{display:block}
+/* Dashboard */
 .hdr{padding-bottom:12px;border-bottom:1px solid var(--b);margin-bottom:14px}
 .ey{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--t4)}
 .ey b{color:#1877F2}
@@ -90,6 +97,21 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
 .fi-hl{color:#FFD166;font-weight:700}
 .ft{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:8px;flex-wrap:wrap;gap:6px}
 .ft span{font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--t4);letter-spacing:1.5px;text-transform:uppercase}
+/* Report view */
+.rep{max-width:720px;margin:0 auto;padding:8px 0 40px}
+.rep-ey{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--t4);margin-bottom:8px}
+.rep h1{font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+.rep-info{font-size:10px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--b)}
+.rep h2{font-size:15px;font-weight:800;margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--b);color:var(--t)}
+.rep h3{font-size:12px;font-weight:700;margin:18px 0 8px;color:var(--blue)}
+.rep p{font-size:13px;line-height:1.75;margin-bottom:10px;color:var(--t2)}
+.rep ul,.rep ol{padding-left:20px;margin-bottom:10px}
+.rep li{font-size:13px;line-height:1.75;color:var(--t2);margin-bottom:4px}
+.rep strong{font-weight:700;color:var(--t)}
+.rep table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.rep th{font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t4);padding:7px 8px;border-bottom:2px solid var(--b);text-align:left;font-size:9px}
+.rep td{padding:8px;border-bottom:1px solid var(--bs);color:var(--t2)}
+.rep-pbar{display:flex;gap:8px;margin-top:28px;padding-top:16px;border-top:1px solid var(--b)}
 @media(min-width:768px){
   body{padding:40px 32px}
   h1{font-size:30px}
@@ -104,11 +126,26 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
   .gc-num{font-size:36px}
   .pie-lg{grid-template-columns:repeat(4,1fr)}
   .fn-sv{font-size:20px;min-width:90px}
+  .rep h1{font-size:28px}
+  .rep h2{font-size:17px}
+}
+@media print{
+  .act-bar,.rep-pbar{display:none!important}
+  #viewDash{display:none!important}
+  .view-rep{display:block!important}
+  body{background:#fff;padding:20px}
+  .rep{max-width:100%}
 }
 </style>
 </head>
 <body>
 <div class="pg">
+
+<div class="act-bar">
+  <button class="act-btn pri" id="btnRep">📄 Ver relatório por escrito</button>
+</div>
+
+<div id="viewDash">
 
 <div class="hdr">
   <div>
@@ -158,6 +195,21 @@ h1{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1;margin:5px 
 <div class="ft">
   <span id="ft-l">Dashboard de Performance</span>
   <span id="ft-r">Gestor: Pedro Silva · Dreams</span>
+</div>
+
+</div><!-- /viewDash -->
+
+<div class="view-rep" id="viewRep">
+  <div class="rep">
+    <div class="rep-ey">Relatório de Performance · <strong>Meta Ads</strong></div>
+    <h1 id="repCli"></h1>
+    <div class="rep-info" id="repInfo"></div>
+    <div id="repContent"></div>
+    <div class="rep-pbar">
+      <button class="act-btn" id="btnBack">← Voltar ao dashboard</button>
+      <button class="act-btn pri" id="btnPrint">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+  </div>
 </div>
 
 </div>
@@ -230,7 +282,8 @@ const _D={
   ],
   pie:{data:[7778.51,3908.99,3630.72,3759.61],total:'R$ 19.077',cores:['#1877F2','#7B2FBE','#0077A8','#E08C00'],labels:['Fundo VEN','Fundo MSG','Meio','Topo'],pcts:['40,8%','20,5%','19,0%','19,7%'],vals:['R$ 7.779','R$ 3.909','R$ 3.631','R$ 3.760']},
   funil_ven:{alcance:'500.000',cliques:'10.950',visitas:'8.241',carrinho:'2.186',checkout:'698',compras:'550',insight:'<span class="fi-hl">550 compras</span> geraram <span class="fi-hl">R$ 154.746 em receita</span> — ROAS de <span class="fi-hl">19,90x</span>. <span class="fi-hl">1.636 pessoas</span> adicionaram ao carrinho mas não finalizaram — oportunidade de remarketing.'},
-  funil_msg:{alcance:'600.000',cliques:'6.830',conversas:'3.726',novos:'2.608',insight:'<span class="fi-hl">3.726 conversas</span> a <span class="fi-hl">R$ 1,05</span> cada. <span class="fi-hl">2.608 novos contatos</span> (70% das conversas) entraram pela primeira vez em contato com o parque.'}
+  funil_msg:{alcance:'600.000',cliques:'6.830',conversas:'3.726',novos:'2.608',insight:'<span class="fi-hl">3.726 conversas</span> a <span class="fi-hl">R$ 1,05</span> cada. <span class="fi-hl">2.608 novos contatos</span> (70% das conversas) entraram pela primeira vez em contato com o parque.'},
+  relatorio:'<h2>Sumário Executivo</h2><p>O Guará Acqua Park encerrou os primeiros 21 dias de julho com <strong>R$19.077 investidos</strong> em anúncios no Meta. A frente de vendas diretas gerou <strong>R$154.746 em receita atribuída</strong> — um retorno de <strong>R$19,90 para cada R$1 aplicado</strong>, resultado que coloca o parque acima da média do setor para períodos de alta temporada.</p><p>No mesmo período, <strong>3.726 pessoas iniciaram conversa com o parque via WhatsApp</strong>, a um custo médio de R$1,05 por contato — volume expressivo que complementa o canal de venda direta e alimenta o pipeline de clientes futuros. Paralelamente, o site recebeu <strong>21.140 visitas qualificadas</strong> e a marca foi apresentada a novos públicos com CPM de R$2,78.</p><p>O período foi marcado por picos de ROAS expressivos entre os dias 09 e 11 de julho (retorno diário acima de 28x sobre o investimento), impulsionados pelas campanhas de combinações e eventos. A estrutura de quatro frentes está funcionando de forma complementar — cada funil cumprindo seu papel no caminho da venda.</p><h2>Resultados por Frente</h2><h3>Fundo de Funil — Vendas Diretas</h3><p><strong>R$7.778 investidos → R$154.746 em receita → ROAS 19,90x</strong></p><p>A frente de vendas registrou <strong>550 compras</strong> no período, com custo por venda médio de <strong>R$14,14</strong>. O ROAS (retorno sobre o investimento em anúncios) de 19,90x significa que para cada R$1 aplicado nessa frente, R$19,90 voltaram em receita.</p><table><thead><tr><th>Campanha</th><th>Investido</th><th>Compras</th><th>CPA</th><th>ROAS</th></tr></thead><tbody><tr><td>Ingresso (01/06/2026)</td><td>R$4.958</td><td>402</td><td>R$12,33</td><td>20,24x</td></tr><tr><td>Combos (09/07/2026)</td><td>R$1.147</td><td>56</td><td>R$20,47</td><td>20,21x</td></tr><tr><td>Eventos (08/07/2026)</td><td>R$729</td><td>46</td><td>R$15,84</td><td>20,42x</td></tr><tr><td>Combos (02/07/2026)</td><td>R$945</td><td>46</td><td>R$20,54</td><td>17,29x</td></tr></tbody></table><p>A campanha de ingresso concentra 73% das compras e tem o melhor CPA do conjunto (R$12,33). As campanhas de combos e eventos mantêm ROAS acima de 17x, confirmando que o público aquecido pelo funil de mensagens converte bem em diferentes produtos.</p><p><strong>Por que isso importa:</strong> ROAS acima de 19x em julho — período de alta concorrência no setor de lazer — indica estrutura madura e escalável. Nenhuma campanha está com CPA em nível de atenção; todas têm espaço para aumento de verba sem risco imediato de perda de eficiência.</p><h3>Fundo de Funil — Mensagens (WhatsApp)</h3><p><strong>R$3.909 investidos → 3.726 conversas → CPL R$1,05</strong></p><p>No período, <strong>3.726 pessoas</strong> iniciaram conversa com o parque via WhatsApp a um custo médio de <strong>R$1,05 por conversa</strong> — custo baixo e volume expressivo para o setor de entretenimento.</p><table><thead><tr><th>Campanha</th><th>Investido</th><th>Conversas</th><th>Custo/Conversa</th></tr></thead><tbody><tr><td>Título (27/10)</td><td>R$2.023</td><td>2.102</td><td>R$0,96</td></tr><tr><td>Excursão (25/09)</td><td>R$954</td><td>1.228</td><td>R$0,78</td></tr><tr><td>Aniversário (21/10)</td><td>R$932</td><td>396</td><td>R$2,35</td></tr></tbody></table><p>A campanha de Excursão apresenta o melhor custo por conversa (R$0,78) com alto volume — é o criativo mais eficiente do funil. A campanha de Aniversário tem custo 2,2x acima da média, sinal de que o criativo ou a segmentação precisa de revisão.</p><p><strong>Por que isso importa:</strong> WhatsApp é o primeiro ponto de contato qualificado com o cliente potencial. Um custo de R$1,05 por nova conversa é eficiente e indica que os criativos estão atraindo o público correto. O volume de 3.726 conversas representa uma base sólida de interesse real no parque — cada uma dessas pessoas entrou em contato ativo com a equipe.</p><h3>Meio de Funil — Tráfego para o Site</h3><p><strong>R$3.631 investidos → 21.140 visitas → R$0,17 por visita</strong></p><p>O parque gerou <strong>21.140 visitas qualificadas</strong> ao site no período, com custo médio de <strong>R$0,17 por visita</strong> — resultado eficiente para campanhas de tráfego.</p><table><thead><tr><th>Campanha</th><th>Investido</th><th>Visitas</th><th>Custo/Visita</th></tr></thead><tbody><tr><td>Site (01/06/2026)</td><td>R$2.194</td><td>11.729</td><td>R$0,19</td></tr><tr><td>Eventos (06/07/2026)</td><td>R$813</td><td>5.992</td><td>R$0,14</td></tr><tr><td>Terça Louca (13/07/2026)</td><td>R$126</td><td>639</td><td>R$0,20</td></tr><tr><td>Outras (pausadas)</td><td>R$498</td><td>2.780</td><td>R$0,18</td></tr></tbody></table><p><strong>Por que isso importa:</strong> Tráfego de qualidade alimenta o pixel e as audiências de remarketing que sustentam a eficiência das campanhas de venda. Sem volume de meio, o fundo perderia alcance progressivamente à medida que as audiências se esgotam — reduzindo ROAS ao longo do tempo.</p><h3>Topo de Funil — Apresentação da Marca</h3><p><strong>R$3.760 investidos → 9.630 visitas ao perfil IG → CPM R$2,78</strong></p><p>A frente de topo apresentou a marca para novos públicos com CPM (custo para apresentar o negócio a mil pessoas) de <strong>R$2,78</strong>. As campanhas de Visita IG geraram <strong>9.630 visitas ao perfil</strong> no período. A campanha Eventos Alcance (iniciada em 07/07) entregou <strong>271.499 impressões</strong> com CPM de apenas R$1,23 — quase 2,3x mais eficiente que a média do topo.</p><table><thead><tr><th>Campanha</th><th>Investido</th><th>Resultado</th><th>Custo</th></tr></thead><tbody><tr><td>Visita IG (01/06/2026)</td><td>R$957</td><td>4.929 visitas IG</td><td>R$0,19/visita</td></tr><tr><td>Visita IG Pais (01/06/2026)</td><td>R$952</td><td>4.701 visitas IG</td><td>R$0,20/visita</td></tr><tr><td>Eventos Alcance (07/07/2026)</td><td>R$589</td><td>271.499 impressões</td><td>CPM R$1,23</td></tr><tr><td>Terça Louca (13/07/2026)</td><td>R$98</td><td>18.101 engajamentos</td><td>—</td></tr></tbody></table><p><strong>Por que isso importa:</strong> O topo de funil é a fonte de reposição constante de audiências novas. Sem ele, as campanhas de meio e fundo atingem repetidamente as mesmas pessoas — reduzindo eficiência ao longo do tempo. CPM de R$2,78 está dentro da faixa eficiente para o setor de lazer e entretenimento.</p><h2>Winners do Período</h2><p><strong>1. Ingresso (01/06/2026) — Fundo Venda</strong><br>ROAS 20,24x | CPA R$12,33 | 402 compras em 21 dias. Campanha mais eficiente e de maior volume do período. Deve permanecer ativa sem alterações e é a principal candidata a aumento de verba.</p><p><strong>2. Excursão (25/09) — Fundo Mensagens</strong><br>CPL R$0,78 | 1.228 conversas. Menor custo por conversa do período, com volume expressivo. Alta prioridade para escala.</p><p><strong>3. Eventos Alcance (07/07/2026) — Topo</strong><br>CPM R$1,23 | 271.499 impressões. Campanha de alcance mais eficiente — mantida ativa, segura e econômica para o topo de funil pelo restante de julho.</p><h2>Oportunidades Identificadas</h2><p><strong>1. Escalar a campanha de Excursão (Fundo Mensagens)</strong><br><strong>O quê:</strong> Aumentar verba diária da campanha de Excursão em 40–60%.<br><strong>Por quê agora:</strong> Menor custo por conversa do período (R$0,78), ainda sem sinal de saturação de audiência. Cada R$1 adicional nessa campanha gera mais retorno do que nas demais.<br><strong>Resultado esperado:</strong> +35–45% de novas conversas sem aumento proporcional do CPL.</p><p><strong>2. Revisar criativo da campanha de Aniversário (Fundo Mensagens)</strong><br><strong>O quê:</strong> Testar novo criativo ou segmentação mais específica (aniversariantes recentes — últimos 30, 60 e 90 dias).<br><strong>Por quê agora:</strong> CPL de R$2,35 é 2,2x a média das outras campanhas de mensagem, indicando desalinhamento entre criativo e audiência. Esse custo elevado reduz o CPL médio geral do funil.<br><strong>Resultado esperado:</strong> CPL reduzido para a faixa de R$1,00–1,50, liberando verba para redistribuição nas campanhas mais eficientes.</p><p><strong>3. Testar escala nas campanhas de Combos (Fundo Venda)</strong><br><strong>O quê:</strong> Aumentar verba das campanhas de Combos (09/07 e 02/07) em 20–30%.<br><strong>Por quê agora:</strong> ROAS acima de 17x em ambas, com volume ainda pequeno (56 e 46 compras). Há espaço para crescimento sem risco de queda de eficiência. Reduz a concentração de receita em uma única campanha (Ingresso).<br><strong>Resultado esperado:</strong> Ampliação do mix de produtos vendidos via anúncio e distribuição mais saudável do investimento no fundo.</p><h2>Conclusão</h2><p>Julho/2026 está sendo um período sólido para o Guará Acqua Park no Meta Ads. ROAS de 19,90x na frente de vendas, custo de R$1,05 por novo contato no WhatsApp e 21.140 visitas qualificadas ao site confirmam que a estrutura de quatro funis está calibrada e entregando. As três oportunidades identificadas acima são de execução simples e podem ser implementadas imediatamente para ampliar os resultados ainda nos próximos dias de julho.</p><p style="font-size:11px;color:var(--t4);margin-top:20px">Gerado em 22/07/2026 · Dados: Meta Ads API (01/07/2026 – 21/07/2026) · Gestor: Pedro Silva · Dreams</p>'
 };
 
 document.getElementById('d-cli').textContent=_D.meta.cliente;
@@ -351,6 +404,17 @@ document.querySelectorAll('.tb').forEach(function(b){
     if(el)el.classList.add('on');
   });
 });
+
+// Report view
+var vd=document.getElementById('viewDash');
+var vr=document.getElementById('viewRep');
+document.getElementById('repCli').textContent=_D.meta.cliente;
+document.getElementById('repInfo').textContent=_D.meta.periodo+' · Conta '+_D.meta.conta+' · Gestor: '+_D.meta.gestor+' · Gerado em '+_D.meta.gerado;
+if(_D.relatorio)document.getElementById('repContent').innerHTML=_D.relatorio;
+window.onbeforeprint=function(){vr.classList.add('on');};
+document.getElementById('btnRep').addEventListener('click',function(){vd.style.display='none';vr.classList.add('on');});
+document.getElementById('btnBack').addEventListener('click',function(){vd.style.display='';vr.classList.remove('on');});
+document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
 </script>
 </body>
 </html>
