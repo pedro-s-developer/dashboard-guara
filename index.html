@@ -336,6 +336,9 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
 .cal-btn:hover,.cal-btn.open{border-color:var(--blue);color:var(--blue);}
 .cal-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(15,23,36,0.14);z-index:1000;width:310px;max-width:calc(100vw - 24px);overflow:hidden;display:none;flex-direction:column;}
 .cal-drop.open{display:flex;animation:fadeUp 0.18s ease;}
+@media(max-width:600px){
+  .cal-drop{position:fixed;top:64px;left:12px;right:12px;width:auto;max-width:none;max-height:calc(100vh - 80px);overflow-y:auto;}
+}
 .cal-presets{display:flex;gap:5px;flex-wrap:wrap;padding:12px 14px 10px;border-bottom:1px solid var(--border-soft);}
 .cal-preset{font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;}
 .cal-preset:hover{border-color:var(--blue);color:var(--blue);}
@@ -385,8 +388,6 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
         </div>
       </div>
     </div>
-    <span class="h-badge" id="periodBadge">01 Jul 2026 – 15 Jul 2026</span>
-    <p class="h-period" id="periodLabel">15 dias de análise</p>
   </div>
 </div>
 
