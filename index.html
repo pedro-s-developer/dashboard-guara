@@ -622,9 +622,10 @@ function _fmtNuma(n){return Math.round(n||0).toLocaleString('pt-BR');}
 function _isoToLblA(iso){var p=iso.split('-');return p[2]+'/'+p[1];}
 
 function detectActiveSegments(D){
-  var base = D.meta.tipo === 'msg' ? ['TOPO','MEIO','FUNDO_MSG']
-           : D.meta.tipo === 'ven' ? ['TOPO','MEIO','FUNDO_VEN']
-           : ['TOPO','MEIO','FUNDO_MSG','FUNDO_VEN'];
+  // Ordem: Fundo → Topo (mesma do template original)
+  var base = D.meta.tipo === 'msg' ? ['FUNDO_MSG','MEIO','TOPO']
+           : D.meta.tipo === 'ven' ? ['FUNDO_VEN','MEIO','TOPO']
+           : ['FUNDO_VEN','FUNDO_MSG','MEIO','TOPO'];
   return base.filter(function(seg){
     return D.campanhas.some(function(c){ return c.funil === seg; });
   });
@@ -1255,30 +1256,23 @@ function _buildRKPIS(segs,totInv){
 }
 
 function aggregateRange(startIso,endIso){
-  var sl=_getSlice(startIso,endIso);
-  var si=sl.si,ei=sl.ei;
+  // FILTER_DATA already sliced by deriveNewSchema — no re-slicing needed
   var FDx=_D.FILTER_DATA;
   var segsOut={};
   ['FUNDO_VEN','FUNDO_MSG','MEIO','TOPO'].forEach(function(seg){
     var f=FDx[seg];
-    var lbls=f.labels.slice(si,ei+1);
-    var inv=f.invest.slice(si,ei+1);
-    var res=f.results.slice(si,ei+1);
-    var cpr=f.cpr.slice(si,ei+1);
-    var rec=f.receita?f.receita.slice(si,ei+1):null;
-    var tI=inv.reduce(function(a,b){return a+b;},0);
-    var tR=res.reduce(function(a,b){return a+b;},0);
-    var tRec=rec?rec.reduce(function(a,b){return a+b;},0):0;
+    var totRec=f.receita?f.receita.reduce(function(a,b){return a+b;},0):0;
     segsOut[seg]={
-      labels:lbls,invest:inv,results:res,cpr:cpr,receita:rec,
+      labels:f.labels,invest:f.invest,results:f.results,cpr:f.cpr,receita:f.receita,
       result_label:f.result_label,cpr_label:f.cpr_label,
       is_currency:f.is_currency,label:f.label,
-      kpi:{invest:tI,results:tR,cpr:tR>0?tI/tR:0,reach:tR},
-      totInv:tI,totRes:tR,totRec:tRec
+      kpi:f.kpi,
+      totInv:f.kpi.invest,totRes:f.kpi.results,totRec:totRec,totReach:f.kpi.reach
     };
   });
-  var daily=_D.DAILY.slice(si,ei+1);
-  return {segs:segsOut,daily:daily,nDays:ei-si+1};
+  // nDays = duração do range (inclusive) — não conta gaps sem dados
+  var nDays=Math.round((new Date(endIso+'T00:00:00')-new Date(startIso+'T00:00:00'))/86400000)+1;
+  return {segs:segsOut,daily:_D.DAILY,nDays:nDays};
 }
 
 function renderRange(startIso,endIso){
