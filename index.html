@@ -693,7 +693,7 @@ function renderObjCards(D, inicio, fim){
 
   var active = detectActiveSegments(D);
   // Contar campanhas ativas por segmento e agregar métricas extras (impr, clicks_wa etc)
-  var extras = {TOPO:{impr:0,n:0}, MEIO:{impr:0,clicks:0,n:0}, FUNDO_MSG:{clicks_wa:0,novos:0,n:0,bestCpr:Infinity}, FUNDO_VEN:{n:0}};
+  var extras = {TOPO:{impr:0,n:0}, MEIO:{impr:0,clicks:0,n:0}, FUNDO_MSG:{clicks_wa:0,n:0,bestCpr:Infinity}, FUNDO_VEN:{n:0}};
   D.campanhas.forEach(function(c){
     if(!extras[c.funil]) return;
     var hasData = c.dias.some(function(d){return d.data>=inicio && d.data<=fim && (d.spend||0)>0;});
@@ -704,7 +704,7 @@ function renderObjCards(D, inicio, fim){
       if(d.data<inicio||d.data>fim) return;
       if(c.funil==='TOPO'){ extras.TOPO.impr += d.impr||0; }
       if(c.funil==='MEIO'){ extras.MEIO.impr += d.impr||0; extras.MEIO.clicks += d.results||0; }
-      if(c.funil==='FUNDO_MSG'){ extras.FUNDO_MSG.clicks_wa += d.clicks_wa||0; extras.FUNDO_MSG.novos += d.novos_contatos||0; }
+      if(c.funil==='FUNDO_MSG'){ extras.FUNDO_MSG.clicks_wa += d.clicks_wa||0; }
       campSpend += d.spend||0;
       campRes += d.results||0;
     });
@@ -762,7 +762,7 @@ function renderObjCards(D, inicio, fim){
       cpr = k.cpr>0 ? _fmtBRLa(k.cpr) : '—';
       cprLbl = 'Custo por Conversa';
       sec1v = pct; sec1l = 'do Invest. Total';
-      sec2v = extras.FUNDO_MSG.novos>0 ? _fmtNuma(extras.FUNDO_MSG.novos) : '—'; sec2l = 'Novos Contatos';
+      sec2v = extras.FUNDO_MSG.clicks_wa>0 ? _fmtNuma(extras.FUNDO_MSG.clicks_wa) : '—'; sec2l = 'Cliques WA';
       sec3v = extras.FUNDO_MSG.bestCpr!==Infinity ? _fmtBRLa(extras.FUNDO_MSG.bestCpr) : '—'; sec3l = 'Melhor CPR';
     } else if(seg==='FUNDO_VEN'){
       mainNum = _fmtNuma(k.results);
@@ -880,7 +880,7 @@ function renderFunilTab(D, inicio, fim){
   if(!container) return;
   // Somar métricas específicas de VEN e MSG do range
   var v = {reach:0, view_content:0, add_to_cart:0, init_checkout:0, compras:0, spend:0, receita:0};
-  var m = {reach:0, clicks_wa:0, results:0, spend:0, novos:0};
+  var m = {reach:0, clicks_wa:0, results:0, spend:0};
   D.campanhas.forEach(function(c){
     c.dias.forEach(function(d){
       if(d.data<inicio||d.data>fim) return;
@@ -892,7 +892,6 @@ function renderFunilTab(D, inicio, fim){
       } else if(c.funil==='FUNDO_MSG'){
         m.reach+=d.reach||0; m.clicks_wa+=d.clicks_wa||0;
         m.results+=d.results||0; m.spend+=d.spend||0;
-        m.novos+=d.novos_contatos||0;
       }
     });
   });
@@ -912,17 +911,15 @@ function renderFunilTab(D, inicio, fim){
   if(tipo!=='ven' && (m.reach>0 || m.results>0)){
     var mp1 = pct(m.clicks_wa, m.reach);
     var mp2 = pct(m.results, m.clicks_wa>0?m.clicks_wa:m.reach);
-    var mp3 = pct(m.novos, m.results);
     html += '<div class="funnel-container">'
       + '<div class="funnel-header">'
-      +   '<div class="funnel-header-left"><div class="funnel-type-icon msg">💬</div><div><div class="funnel-title">Funil de Conversa (WhatsApp)</div><div class="funnel-subtitle">Do alcance ao novo contato</div></div></div>'
+      +   '<div class="funnel-header-left"><div class="funnel-type-icon msg">💬</div><div><div class="funnel-title">Funil de Conversa (WhatsApp)</div><div class="funnel-subtitle">Do alcance à conversa</div></div></div>'
       +   '<span class="funnel-tag msg">MSG</span>'
       + '</div>'
       + '<div class="funnel-reach-banner"><span style="font-size:18px;">👁</span><div><div class="funnel-reach-label">Alcance total</div><div class="funnel-reach-val">'+_fmtNuma(m.reach)+' pessoas</div></div><span class="funnel-reach-arrow">↓</span></div>'
       + '<div class="funnel-stages">'
-      +   stg('s-blue','🖱','Cliques WA','Etapa 1 de 3', m.clicks_wa, mp1, 'do alcance')
-      +   stg('s-purple','💬','Conversas iniciadas','Etapa 2 de 3', m.results, mp2, m.clicks_wa>0?'dos cliques':'do alcance')
-      +   stg('s-green','👤','Novos contatos','Etapa 3 de 3', m.novos, mp3, 'das conversas')
+      +   stg('s-blue','🖱','Cliques WA','Etapa 1 de 2', m.clicks_wa, mp1, 'do alcance')
+      +   stg('s-purple','💬','Conversas iniciadas','Etapa 2 de 2', m.results, mp2, m.clicks_wa>0?'dos cliques':'do alcance')
       + '</div>'
       + (m.results>0?'<div class="funnel-insight"><div class="funnel-insight-icon">✨</div><div class="funnel-insight-text">De <span class="funnel-insight-hl">'+_fmtNuma(m.reach)+' pessoas alcançadas</span>, '+_fmtNuma(m.results)+' iniciaram conversa. Custo médio de <span class="funnel-insight-hl">'+_fmtBRLa(m.spend/m.results)+' por conversa</span>.</div></div>':'')
       + '</div>';
@@ -1260,7 +1257,7 @@ function _buildRKPIS(segs,totInv){
       {label:'Investido',value:_fmtR(msg.totInv),raw:msg.totInv,color:'var(--text)',sub:pct(msg.totInv)},
       {label:'Conversas',value:_fmtN(msg.totRes),raw:msg.totRes,color:'var(--purple)',sub:'iniciadas no período'},
       {label:'Custo/Conversa',value:msg.totRes>0?_fmtR(msg.totInv/msg.totRes):'—',raw:msg.totRes>0?msg.totInv/msg.totRes:0,color:'var(--yellow)',sub:'eficiência'},
-      {label:'Novos Contatos',value:'—',raw:0,color:'var(--teal)',sub:'dados não desagregados'}
+      {label:'Alcance MSG',value:_fmtN(msg.totReach||msg.kpi&&msg.kpi.reach||0),raw:msg.totReach||0,color:'var(--teal)',sub:'pessoas impactadas'}
     ]},
     MEIO:{legend:'Meio — Tráfego',kpis:[
       {label:'Investido',value:_fmtR(meio.totInv),raw:meio.totInv,color:'var(--text)',sub:pct(meio.totInv)},
