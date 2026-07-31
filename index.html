@@ -334,22 +334,13 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
 .cal-wrap{position:relative;display:inline-block;}
 .cal-btn{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
 .cal-btn:hover,.cal-btn.open{border-color:var(--blue);color:var(--blue);}
-.cal-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(15,23,36,0.14);z-index:1000;width:560px;max-width:calc(100vw - 24px);overflow:hidden;display:none;}
-.cal-drop.open{display:block;animation:fadeUp 0.18s ease;}
-.cal-inner{display:flex;flex-direction:row;}
-.cal-presets{display:flex;flex-direction:column;gap:2px;padding:10px 6px;border-right:1px solid var(--border-soft);min-width:140px;flex-shrink:0;background:#FAFBFC;}
-.cal-preset{font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;padding:6px 10px;border-radius:6px;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;text-align:left;width:100%;}
-.cal-preset:hover{background:var(--blue-bg);color:var(--blue);}
-.cal-preset.active{background:var(--blue);color:#fff;font-weight:700;}
-.cal-body{padding:12px 14px 8px;flex:1;min-width:0;}
-@media(max-width:520px){
-  .cal-drop{width:340px;}
-  .cal-inner{flex-direction:column;}
-  .cal-presets{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border-soft);min-width:0;}
-  .cal-preset{padding:4px 10px;border-radius:20px;font-size:10px;}
-  .cal-preset:hover,.cal-preset.active{border:1.5px solid transparent;}
-  .cal-preset.active{background:var(--blue);color:#fff;}
-}
+.cal-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(15,23,36,0.14);z-index:1000;width:310px;max-width:calc(100vw - 24px);overflow:hidden;display:none;flex-direction:column;}
+.cal-drop.open{display:flex;animation:fadeUp 0.18s ease;}
+.cal-presets{display:flex;gap:5px;flex-wrap:wrap;padding:12px 14px 10px;border-bottom:1px solid var(--border-soft);}
+.cal-preset{font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.cal-preset:hover{border-color:var(--blue);color:var(--blue);}
+.cal-preset.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.cal-body{padding:12px 14px 8px;}
 .cal-month-label{text-align:center;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;letter-spacing:0.5px;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .cal-dow{font-size:8px;font-weight:700;text-align:center;color:var(--text4);padding:3px 0;text-transform:uppercase;letter-spacing:0.5px;}
@@ -384,14 +375,10 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
     <div class="cal-wrap">
       <button class="cal-btn" id="calBtn">📅 <span id="calBtnLabel">01/07 – 15/07</span> ▾</button>
       <div class="cal-drop" id="calDrop">
-        <div class="cal-inner">
-          <div class="cal-presets" id="calPresets"></div>
-          <div style="flex:1;min-width:0;">
-            <div class="cal-nav" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;"><button id="calPrev" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:14px;color:var(--text3);padding:2px 10px;line-height:1;">‹</button><span id="calMonthLabel" style="font-size:12px;font-weight:700;color:var(--text2);">—</span><button id="calNext" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:14px;color:var(--text3);padding:2px 10px;line-height:1;">›</button></div>
-            <div class="cal-body" id="calBody"></div>
-            <p class="cal-hint" id="calHint">Clique no dia inicial e depois no dia final para definir o período</p>
-          </div>
-        </div>
+        <div class="cal-presets" id="calPresets"></div>
+        <div class="cal-nav" style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border-soft);"><button id="calPrev" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:14px;color:var(--text3);padding:2px 10px;line-height:1;">‹</button><span id="calMonthLabel" style="font-size:12px;font-weight:700;color:var(--text2);">—</span><button id="calNext" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:14px;color:var(--text3);padding:2px 10px;line-height:1;">›</button></div>
+        <div class="cal-body" id="calBody"></div>
+        <p class="cal-hint" id="calHint">Clique no dia inicial e depois no dia final para definir o período</p>
         <div class="cal-foot">
           <span class="cal-foot-range" id="calFootRange">—</span>
           <button class="cal-apply" onclick="calApply()">Aplicar</button>
@@ -1521,7 +1508,7 @@ function renderRange(startIso,endIso){
     html+='</div>';
     body.innerHTML=html;
     body.querySelectorAll('.cal-day[data-iso]').forEach(function(btn){
-      btn.addEventListener('click',function(){calClickDayNew(btn.getAttribute('data-iso'));});
+      btn.addEventListener('click',function(e){e.stopPropagation();calClickDayNew(btn.getAttribute('data-iso'));});
     });
     var hint=document.getElementById('calHint');
     if(hint) hint.textContent=_temp.step===1?'Agora clique no dia final':'Clique no dia inicial';
