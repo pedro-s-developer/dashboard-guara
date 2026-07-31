@@ -435,105 +435,7 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
 
 <!-- GERAL CARDS (visível só quando filtro = GERAL) -->
 <div id="geralCards" style="display:none;margin-bottom:10px;">
-  <div class="obj-grid">
-
-    <!-- TOPO -->
-    <div class="obj-card" style="background:#FFF9EC;border-color:rgba(224,140,0,0.3);">
-      <div class="obj-bar" style="background:#E08C00;"></div>
-      <div class="obj-body">
-        <div class="obj-head">
-          <div class="obj-head-left">
-            <div class="obj-icon" style="color:#E08C00;">🎯</div>
-            <div><div class="obj-title" style="color:#E08C00;">Topo — Awareness</div><div class="obj-camps">3 campanhas ativas</div></div>
-          </div>
-          <span class="obj-invest">R$ 1.740,72</span>
-        </div>
-        <div class="obj-main">
-          <div><div class="obj-num" style="color:#E08C00;">601.756</div><div class="obj-num-label">Pessoas alcançadas</div></div>
-          <div><div class="obj-cpr">R$ 2,77</div><div class="obj-cpr-label">CPM</div></div>
-        </div>
-        <div class="obj-div"></div>
-        <div class="obj-sec">
-          <div><div class="obj-sec-val">14,5%</div><div class="obj-sec-label">do Invest. Total</div></div>
-          <div><div class="obj-sec-val">627.294</div><div class="obj-sec-label">Impressões</div></div>
-          <div><div class="obj-sec-val">6.978</div><div class="obj-sec-label">Visitas ao IG</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MEIO -->
-    <div class="obj-card" style="background:#E0F4FA;border-color:rgba(0,119,168,0.3);">
-      <div class="obj-bar" style="background:#0077A8;"></div>
-      <div class="obj-body">
-        <div class="obj-head">
-          <div class="obj-head-left">
-            <div class="obj-icon" style="color:#0077A8;">🌐</div>
-            <div><div class="obj-title" style="color:#0077A8;">Meio — Tráfego</div><div class="obj-camps">2 campanhas ativas</div></div>
-          </div>
-          <span class="obj-invest">R$ 1.925,86</span>
-        </div>
-        <div class="obj-main">
-          <div><div class="obj-num" style="color:#0077A8;">11.270</div><div class="obj-num-label">Visitas à página</div></div>
-          <div><div class="obj-cpr">R$ 0,17</div><div class="obj-cpr-label">Custo por Visita</div></div>
-        </div>
-        <div class="obj-div"></div>
-        <div class="obj-sec">
-          <div><div class="obj-sec-val">16,0%</div><div class="obj-sec-label">do Invest. Total</div></div>
-          <div><div class="obj-sec-val">13.553</div><div class="obj-sec-label">Cliques</div></div>
-          <div><div class="obj-sec-val">2,84%</div><div class="obj-sec-label">CTR médio</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FUNDO MSG -->
-    <div class="obj-card msg">
-      <div class="obj-bar msg"></div>
-      <div class="obj-body">
-        <div class="obj-head">
-          <div class="obj-head-left">
-            <div class="obj-icon" style="color:#7B2FBE;">💬</div>
-            <div><div class="obj-title msg">Fundo — Conversas (MSG)</div><div class="obj-camps">3 campanhas ativas</div></div>
-          </div>
-          <span class="obj-invest">R$ 2.865,15</span>
-        </div>
-        <div class="obj-main">
-          <div><div class="obj-num msg">2.714</div><div class="obj-num-label">Conversas iniciadas</div></div>
-          <div><div class="obj-cpr">R$ 1,06</div><div class="obj-cpr-label">Custo por Conversa</div></div>
-        </div>
-        <div class="obj-div"></div>
-        <div class="obj-sec">
-          <div><div class="obj-sec-val">23,8%</div><div class="obj-sec-label">do Invest. Total</div></div>
-          <div><div class="obj-sec-val">1.921</div><div class="obj-sec-label">Novos Contatos</div></div>
-          <div><div class="obj-sec-val">R$ 0,94</div><div class="obj-sec-label">Melhor CPR</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FUNDO VEN -->
-    <div class="obj-card ven">
-      <div class="obj-bar ven"></div>
-      <div class="obj-body">
-        <div class="obj-head">
-          <div class="obj-head-left">
-            <div class="obj-icon" style="color:#1877F2;">🛒</div>
-            <div><div class="obj-title ven">Fundo — Vendas (VEN)</div><div class="obj-camps">4 campanhas ativas</div></div>
-          </div>
-          <span class="obj-invest">R$ 5.514,49</span>
-        </div>
-        <div class="obj-main">
-          <div><div class="obj-num ven">384</div><div class="obj-num-label">Compras finalizadas</div></div>
-          <div><div class="obj-cpr">R$ 14,36</div><div class="obj-cpr-label">Custo por Venda</div></div>
-        </div>
-        <div class="obj-div"></div>
-        <div class="obj-sec">
-          <div><div class="obj-sec-val" style="color:var(--green);">—</div><div class="obj-sec-label">ROAS</div></div>
-          <div><div class="obj-sec-val">—</div><div class="obj-sec-label">Receita Atrib.</div></div>
-          <div><div class="obj-sec-val">R$ 260</div><div class="obj-sec-label">Ticket Médio</div></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+  <div class="obj-grid" id="objCardsContainer"></div>
 </div>
 
 <!-- CHARTS GRID -->
@@ -782,8 +684,124 @@ function _buildDAILY(D, inicio, fim){
 
 
 // ═══════════════════════════════════════════════════════════
-// RENDERERS DINÂMICOS — Campanhas e Funil tabs
+// RENDERERS DINÂMICOS — Obj-cards, Campanhas e Funil tabs
 // ═══════════════════════════════════════════════════════════
+
+function renderObjCards(D, inicio, fim){
+  var container = document.getElementById('objCardsContainer');
+  if(!container) return;
+
+  var active = detectActiveSegments(D);
+  // Contar campanhas ativas por segmento e agregar métricas extras (impr, clicks_wa etc)
+  var extras = {TOPO:{impr:0,n:0}, MEIO:{impr:0,clicks:0,n:0}, FUNDO_MSG:{clicks_wa:0,novos:0,n:0,bestCpr:Infinity}, FUNDO_VEN:{n:0}};
+  D.campanhas.forEach(function(c){
+    if(!extras[c.funil]) return;
+    var hasData = c.dias.some(function(d){return d.data>=inicio && d.data<=fim && (d.spend||0)>0;});
+    if(!hasData) return;
+    extras[c.funil].n++;
+    var campSpend=0, campRes=0;
+    c.dias.forEach(function(d){
+      if(d.data<inicio||d.data>fim) return;
+      if(c.funil==='TOPO'){ extras.TOPO.impr += d.impr||0; }
+      if(c.funil==='MEIO'){ extras.MEIO.impr += d.impr||0; extras.MEIO.clicks += d.results||0; }
+      if(c.funil==='FUNDO_MSG'){ extras.FUNDO_MSG.clicks_wa += d.clicks_wa||0; extras.FUNDO_MSG.novos += d.novos_contatos||0; }
+      campSpend += d.spend||0;
+      campRes += d.results||0;
+    });
+    if(c.funil==='FUNDO_MSG' && campRes>0){
+      var cpr = campSpend/campRes;
+      if(cpr < extras.FUNDO_MSG.bestCpr) extras.FUNDO_MSG.bestCpr = cpr;
+    }
+  });
+
+  // Total invest para calcular %
+  var totInv = 0;
+  ['TOPO','MEIO','FUNDO_MSG','FUNDO_VEN'].forEach(function(seg){
+    if(D.FILTER_DATA[seg]) totInv += D.FILTER_DATA[seg].kpi.invest;
+  });
+
+  // Ordem: FUNDO_VEN, FUNDO_MSG, MEIO, TOPO (fundo → topo)
+  var order = active.slice(); // já vem na ordem correta de detectActiveSegments
+  var META = {
+    TOPO: {bg:'#FFF9EC', border:'rgba(224,140,0,0.3)', bar:'#E08C00', color:'#E08C00', icon:'🎯', title:'Topo — Awareness'},
+    MEIO: {bg:'#E0F4FA', border:'rgba(0,119,168,0.3)', bar:'#0077A8', color:'#0077A8', icon:'🌐', title:'Meio — Tráfego'},
+    FUNDO_MSG: {bg:'var(--purple-bg)', border:'rgba(123,47,190,0.3)', bar:'#7B2FBE', color:'#7B2FBE', icon:'💬', title:'Fundo — Conversas (MSG)', cls:'msg'},
+    FUNDO_VEN: {bg:'var(--blue-bg)', border:'rgba(24,119,242,0.3)', bar:'#1877F2', color:'#1877F2', icon:'🛒', title:'Fundo — Vendas (VEN)', cls:'ven'}
+  };
+
+  container.innerHTML = order.map(function(seg){
+    var m = META[seg];
+    var f = D.FILTER_DATA[seg];
+    if(!f) return '';
+    var k = f.kpi;
+    var n = extras[seg].n;
+    var pct = totInv>0 ? (k.invest/totInv*100).toFixed(1).replace('.',',')+'%' : '—';
+
+    var mainNum, mainNumLbl, cpr, cprLbl, sec1v, sec1l, sec2v, sec2l, sec3v, sec3l;
+
+    if(seg==='TOPO'){
+      mainNum = _fmtNuma(k.results);
+      mainNumLbl = 'Pessoas alcançadas';
+      cpr = k.cpr>0 ? _fmtBRLa(k.cpr) : '—';
+      cprLbl = 'CPM';
+      sec1v = pct; sec1l = 'do Invest. Total';
+      sec2v = _fmtNuma(extras.TOPO.impr); sec2l = 'Impressões';
+      sec3v = '—'; sec3l = 'Visitas ao IG';
+    } else if(seg==='MEIO'){
+      mainNum = _fmtNuma(k.results);
+      mainNumLbl = 'Visitas à página';
+      cpr = k.cpr>0 ? _fmtBRLa(k.cpr) : '—';
+      cprLbl = 'Custo por Visita';
+      sec1v = pct; sec1l = 'do Invest. Total';
+      sec2v = _fmtNuma(extras.MEIO.clicks); sec2l = 'Cliques';
+      var ctr = extras.MEIO.impr>0 ? (extras.MEIO.clicks/extras.MEIO.impr*100).toFixed(2).replace('.',',')+'%' : '—';
+      sec3v = ctr; sec3l = 'CTR médio';
+    } else if(seg==='FUNDO_MSG'){
+      mainNum = _fmtNuma(k.results);
+      mainNumLbl = 'Conversas iniciadas';
+      cpr = k.cpr>0 ? _fmtBRLa(k.cpr) : '—';
+      cprLbl = 'Custo por Conversa';
+      sec1v = pct; sec1l = 'do Invest. Total';
+      sec2v = extras.FUNDO_MSG.novos>0 ? _fmtNuma(extras.FUNDO_MSG.novos) : '—'; sec2l = 'Novos Contatos';
+      sec3v = extras.FUNDO_MSG.bestCpr!==Infinity ? _fmtBRLa(extras.FUNDO_MSG.bestCpr) : '—'; sec3l = 'Melhor CPR';
+    } else if(seg==='FUNDO_VEN'){
+      mainNum = _fmtNuma(k.results);
+      mainNumLbl = 'Compras finalizadas';
+      cpr = k.cpr>0 ? _fmtBRLa(k.cpr) : '—';
+      cprLbl = 'Custo por Venda';
+      var totRec = (f.receita||[]).reduce(function(a,b){return a+b;},0);
+      var roas = k.invest>0 ? totRec/k.invest : 0;
+      sec1v = roas>0 ? roas.toFixed(2).replace('.',',')+'x' : '—'; sec1l = 'ROAS';
+      sec2v = totRec>0 ? _fmtBRLa(totRec,0) : '—'; sec2l = 'Receita Atrib.';
+      var ticket = k.results>0 && totRec>0 ? totRec/k.results : 0;
+      sec3v = ticket>0 ? _fmtBRLa(ticket,0) : '—'; sec3l = 'Ticket Médio';
+    }
+
+    var sec1style = seg==='FUNDO_VEN' ? ' style="color:var(--green);"' : '';
+    return '<div class="obj-card'+(m.cls?' '+m.cls:'')+'" style="background:'+m.bg+';border-color:'+m.border+';">'
+      + '<div class="obj-bar'+(m.cls?' '+m.cls:'')+'" style="background:'+m.bar+';"></div>'
+      + '<div class="obj-body">'
+      +   '<div class="obj-head">'
+      +     '<div class="obj-head-left">'
+      +       '<div class="obj-icon" style="color:'+m.color+';">'+m.icon+'</div>'
+      +       '<div><div class="obj-title'+(m.cls?' '+m.cls:'')+'" style="color:'+m.color+';">'+m.title+'</div><div class="obj-camps">'+n+' campanha'+(n>1?'s':'')+' ativa'+(n>1?'s':'')+'</div></div>'
+      +     '</div>'
+      +     '<span class="obj-invest">R$ '+k.invest.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</span>'
+      +   '</div>'
+      +   '<div class="obj-main">'
+      +     '<div><div class="obj-num'+(m.cls?' '+m.cls:'')+'" style="color:'+m.color+';">'+mainNum+'</div><div class="obj-num-label">'+mainNumLbl+'</div></div>'
+      +     '<div><div class="obj-cpr">'+cpr+'</div><div class="obj-cpr-label">'+cprLbl+'</div></div>'
+      +   '</div>'
+      +   '<div class="obj-div"></div>'
+      +   '<div class="obj-sec">'
+      +     '<div><div class="obj-sec-val"'+sec1style+'>'+sec1v+'</div><div class="obj-sec-label">'+sec1l+'</div></div>'
+      +     '<div><div class="obj-sec-val">'+sec2v+'</div><div class="obj-sec-label">'+sec2l+'</div></div>'
+      +     '<div><div class="obj-sec-val">'+sec3v+'</div><div class="obj-sec-label">'+sec3l+'</div></div>'
+      +   '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
 
 function renderCampanhasTab(D){
   var container = document.getElementById('tab-campanhas');
@@ -862,7 +880,7 @@ function renderFunilTab(D, inicio, fim){
   if(!container) return;
   // Somar métricas específicas de VEN e MSG do range
   var v = {reach:0, view_content:0, add_to_cart:0, init_checkout:0, compras:0, spend:0, receita:0};
-  var m = {reach:0, clicks_wa:0, results:0, spend:0};
+  var m = {reach:0, clicks_wa:0, results:0, spend:0, novos:0};
   D.campanhas.forEach(function(c){
     c.dias.forEach(function(d){
       if(d.data<inicio||d.data>fim) return;
@@ -874,6 +892,7 @@ function renderFunilTab(D, inicio, fim){
       } else if(c.funil==='FUNDO_MSG'){
         m.reach+=d.reach||0; m.clicks_wa+=d.clicks_wa||0;
         m.results+=d.results||0; m.spend+=d.spend||0;
+        m.novos+=d.novos_contatos||0;
       }
     });
   });
@@ -893,15 +912,17 @@ function renderFunilTab(D, inicio, fim){
   if(tipo!=='ven' && (m.reach>0 || m.results>0)){
     var mp1 = pct(m.clicks_wa, m.reach);
     var mp2 = pct(m.results, m.clicks_wa>0?m.clicks_wa:m.reach);
+    var mp3 = pct(m.novos, m.results);
     html += '<div class="funnel-container">'
       + '<div class="funnel-header">'
-      +   '<div class="funnel-header-left"><div class="funnel-type-icon msg">💬</div><div><div class="funnel-title">Funil de Conversa (WhatsApp)</div><div class="funnel-subtitle">Do alcance à conversa</div></div></div>'
+      +   '<div class="funnel-header-left"><div class="funnel-type-icon msg">💬</div><div><div class="funnel-title">Funil de Conversa (WhatsApp)</div><div class="funnel-subtitle">Do alcance ao novo contato</div></div></div>'
       +   '<span class="funnel-tag msg">MSG</span>'
       + '</div>'
       + '<div class="funnel-reach-banner"><span style="font-size:18px;">👁</span><div><div class="funnel-reach-label">Alcance total</div><div class="funnel-reach-val">'+_fmtNuma(m.reach)+' pessoas</div></div><span class="funnel-reach-arrow">↓</span></div>'
       + '<div class="funnel-stages">'
-      +   stg('s-blue','🖱','Cliques WA','Etapa 1 de 2', m.clicks_wa, mp1, 'do alcance')
-      +   stg('s-purple','💬','Conversas iniciadas','Etapa 2 de 2', m.results, mp2, m.clicks_wa>0?'dos cliques':'do alcance')
+      +   stg('s-blue','🖱','Cliques WA','Etapa 1 de 3', m.clicks_wa, mp1, 'do alcance')
+      +   stg('s-purple','💬','Conversas iniciadas','Etapa 2 de 3', m.results, mp2, m.clicks_wa>0?'dos cliques':'do alcance')
+      +   stg('s-green','👤','Novos contatos','Etapa 3 de 3', m.novos, mp3, 'das conversas')
       + '</div>'
       + (m.results>0?'<div class="funnel-insight"><div class="funnel-insight-icon">✨</div><div class="funnel-insight-text">De <span class="funnel-insight-hl">'+_fmtNuma(m.reach)+' pessoas alcançadas</span>, '+_fmtNuma(m.results)+' iniciaram conversa. Custo médio de <span class="funnel-insight-hl">'+_fmtBRLa(m.spend/m.results)+' por conversa</span>.</div></div>':'')
       + '</div>';
@@ -1395,7 +1416,8 @@ function renderRange(startIso,endIso){
   var dtEl=document.getElementById('dayTableBody');
   if(dtEl) dtEl.innerHTML=dtHtml;
 
-  // ── Render Campanhas + Funil tabs dinamicamente ──────────
+  // ── Render obj-cards, Campanhas + Funil tabs dinamicamente ──
+  renderObjCards(_D, startIso, endIso);
   renderCampanhasTab(_D);
   renderFunilTab(_D, startIso, endIso);
 
