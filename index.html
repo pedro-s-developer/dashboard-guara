@@ -512,7 +512,7 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
     <div class="chart-title" id="chart1Title">Evolução — Fundo Vendas</div>
     <div class="chart-sub" id="chart1Sub">Investido diário × Compras realizadas</div>
     <div class="panel-row"><h3>Investido × Resultados por dia</h3><span class="panel-sub">eixos separados</span></div>
-    <div class="chart-legend"><span><span class="lg-sw-bar"></span>Investido (R$)</span><span><span class="lg-sw-line"></span><span id="lgResult">Compras</span></span><span id="lgReceita"><span class="lg-sw-line" style="background:#00934a;"></span>Receita (R$)</span></div>
+    <div class="chart-legend"><span><span class="lg-sw-bar"></span>Investido (R$)</span><span><span class="lg-sw-line"></span><span id="lgResult">Compras</span></span></div>
     <div class="chart-canvas-wrap" style="height:200px;"><canvas id="chartInvestRes"></canvas></div>
     <div class="panel-divider"></div>
     <div class="panel-row"><h3 id="cprChartTitle">Custo por Compra diário</h3><span class="panel-sub">tendência</span></div>
@@ -1087,20 +1087,24 @@ var TT={backgroundColor:'#fff',titleColor:'#0F1724',bodyColor:'#0F1724',borderCo
 
 // ── CHART 1: Invest × Results ─────────────────────────────────
 var seg='FUNDO_VEN';
+var _receitaMap={};
 var c1=new Chart(document.getElementById('chartInvestRes'),{
   data:{labels:FD[seg].labels,datasets:[
     {type:'bar',label:'Investido (R$)',data:FD[seg].invest,backgroundColor:'#FEE8E8',borderColor:'#E31E24',borderWidth:0.5,borderRadius:4,yAxisID:'y',order:2},
-    {type:'line',label:FD[seg].result_label,data:FD[seg].results,borderColor:'#E31E24',backgroundColor:'#E31E24',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y1',order:1},
-    {type:'line',label:'Receita (R$)',data:FD[seg].receita||[],borderColor:'#00934a',backgroundColor:'rgba(0,147,74,0.1)',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y',order:0,fill:false}
+    {type:'line',label:FD[seg].result_label,data:FD[seg].results,borderColor:'#E31E24',backgroundColor:'#E31E24',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y1',order:1}
   ]},
   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:function(ctx){
-      if(ctx.dataset.yAxisID==='y') return ctx.dataset.label+': R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2});
-      return ctx.dataset.label+': '+ctx.parsed.y;
-    }}}},
+    plugins:{legend:{display:false},tooltip:{...TT,callbacks:{
+      label:function(ctx){
+        return ctx.dataset.yAxisID==='y'?ctx.dataset.label+': R$ '+ctx.parsed.y.toFixed(2):ctx.dataset.label+': '+ctx.parsed.y;
+      },
+      afterLabel:function(ctx){
+        if(ctx.datasetIndex===1){var r=_receitaMap[ctx.label];if(r>0)return 'Receita (R$): R$ '+r.toLocaleString('pt-BR',{minimumFractionDigits:2});}
+      }
+    }}},
     scales:{
       x:{grid:{display:false},border:{display:false},ticks:{font:{size:9},maxRotation:0}},
-      y:{position:'left',beginAtZero:true,grid:{color:'#EEF1F6'},border:{display:false},ticks:{font:{size:9},callback:function(v){return 'R$'+v.toLocaleString('pt-BR');}}},
+      y:{position:'left',beginAtZero:true,grid:{color:'#EEF1F6'},border:{display:false},ticks:{font:{size:9},callback:function(v){return 'R$'+v;}}},
       y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{font:{size:9}}}
     }
   }
@@ -1266,6 +1270,8 @@ function applyFilter(s){
   document.getElementById('lgCpr').textContent=fd.cpr_label;
   document.getElementById('cprChartTitle').textContent=fd.cpr_label+' diário';
   // update charts
+  _receitaMap={};
+  if(s==='FUNDO_VEN'&&fd.receita){fd.labels.forEach(function(lbl,i){_receitaMap[lbl]=fd.receita[i]||0;});}
   c1.data.labels=fd.labels;
   c1.data.datasets[0].data=fd.invest;
   c1.data.datasets[0].backgroundColor=barColors[s]||'#FEE8E8';
@@ -1274,10 +1280,6 @@ function applyFilter(s){
   c1.data.datasets[1].label=fd.result_label;
   c1.data.datasets[1].borderColor=lineColors[s]||'#E31E24';
   c1.data.datasets[1].backgroundColor=lineColors[s]||'#E31E24';
-  c1.data.datasets[2].data=s==='FUNDO_VEN'?(fd.receita||[]):[];
-  c1.data.datasets[2].hidden=s!=='FUNDO_VEN';
-  var lgReceita=document.getElementById('lgReceita');
-  if(lgReceita) lgReceita.style.display=s==='FUNDO_VEN'?'':'none';
   c1.update();
   c2.data.labels=fd.labels;
   c2.data.datasets[0].data=fd.cpr;
