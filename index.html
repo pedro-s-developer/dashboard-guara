@@ -1091,19 +1091,17 @@ var c1=new Chart(document.getElementById('chartInvestRes'),{
   data:{labels:FD[seg].labels,datasets:[
     {type:'bar',label:'Investido (R$)',data:FD[seg].invest,backgroundColor:'#FEE8E8',borderColor:'#E31E24',borderWidth:0.5,borderRadius:4,yAxisID:'y',order:2},
     {type:'line',label:FD[seg].result_label,data:FD[seg].results,borderColor:'#E31E24',backgroundColor:'#E31E24',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y1',order:1},
-    {type:'line',label:'Receita (R$)',data:FD[seg].receita||[],borderColor:'#00934a',backgroundColor:'rgba(0,147,74,0.1)',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y2',order:0,fill:false}
+    {type:'line',label:'Receita (R$)',data:FD[seg].receita||[],borderColor:'#00934a',backgroundColor:'rgba(0,147,74,0.1)',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y',order:0,fill:false}
   ]},
   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:function(ctx){
-      if(ctx.dataset.yAxisID==='y') return ctx.dataset.label+': R$ '+ctx.parsed.y.toFixed(2);
-      if(ctx.dataset.yAxisID==='y2') return ctx.dataset.label+': R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2});
+      if(ctx.dataset.yAxisID==='y') return ctx.dataset.label+': R$ '+ctx.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2});
       return ctx.dataset.label+': '+ctx.parsed.y;
     }}}},
     scales:{
       x:{grid:{display:false},border:{display:false},ticks:{font:{size:9},maxRotation:0}},
-      y:{position:'left',beginAtZero:true,grid:{color:'#EEF1F6'},border:{display:false},ticks:{font:{size:9},callback:function(v){return 'R$'+v;}}},
-      y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{font:{size:9}}},
-      y2:{display:false,position:'right',beginAtZero:true,grid:{display:false}}
+      y:{position:'left',beginAtZero:true,grid:{color:'#EEF1F6'},border:{display:false},ticks:{font:{size:9},callback:function(v){return 'R$'+v.toLocaleString('pt-BR');}}},
+      y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{font:{size:9}}}
     }
   }
 });
