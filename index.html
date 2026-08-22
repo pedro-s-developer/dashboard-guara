@@ -1580,7 +1580,7 @@ function _buildDAILY(D, inicio, fim){
       if(c.funil === 'FUNDO_MSG') byDate[d.data].conversas += d.results||0;
     });
   });
-  return Object.keys(byDate).sort().map(function(k){return byDate[k];});
+  return byDate;
 }
 
 
@@ -1982,8 +1982,11 @@ function execDeltaBadge(current, previous, direction){
   var absd = Math.abs(d);
   if (absd < 1) return '<span class="delta-neutral">' + arrowIcon('right') + ' estável vs período anterior</span>';
   var up = d > 0;
-  var isPos = direction === 'higher_is_better' ? up : !up;
-  var cls = isPos ? 'delta-pos' : 'delta-neg';
+  var isPos;
+  if (direction === 'higher_is_better') isPos = up;
+  else if (direction === 'lower_is_better') isPos = !up;
+  else isPos = null;
+  var cls = isPos === null ? 'delta-neutral' : (isPos ? 'delta-pos' : 'delta-neg');
   var arrow = up ? arrowIcon('up') : arrowIcon('down');
   var sign = up ? '+' : '';
   var val = absd >= 100 ? Math.round(absd) : absd.toFixed(1);
@@ -2506,8 +2509,10 @@ function renderMainChart(seg, inicio, fim){
     '<span class="legend-item"><span class="legend-swatch" style="background:#D6D3D1;"></span>Investido (R$)</span>' +
     '<span class="legend-item"><span class="legend-line" style="background:#0284C7;"></span>' + resultLabel + '</span>';
 
-  if (_chartMain) _chartMain.destroy();
-  _chartMain = new Chart(document.getElementById('chartMain'), {
+  var _canvasMain = document.getElementById('chartMain');
+  var _existingMain = Chart.getChart(_canvasMain);
+  if (_existingMain) _existingMain.destroy();
+  _chartMain = new Chart(_canvasMain, {
     data: {
       labels: labels,
       datasets: [
@@ -2588,8 +2593,10 @@ function renderMainChart(seg, inicio, fim){
   // CPR chart
   document.getElementById('cprChartTitle').textContent = f.cpr_label + ' ao longo do tempo';
 
-  if (_chartCPR) _chartCPR.destroy();
-  _chartCPR = new Chart(document.getElementById('chartCPR'), {
+  var _canvasCPR = document.getElementById('chartCPR');
+  var _existingCPR = Chart.getChart(_canvasCPR);
+  if (_existingCPR) _existingCPR.destroy();
+  _chartCPR = new Chart(_canvasCPR, {
     type: 'line',
     data: {
       labels: labels,
@@ -3256,28 +3263,30 @@ function renderAll(inicio, fim, seg){
   _currentRange = { start: inicio, end: fim };
   _currentSeg = seg;
 
-  renderExecSummary(inicio, fim);
-  renderRecommendations(inicio, fim);
-  renderKPIs(seg, inicio, fim);
+  // Atualiza label PRIMEIRO — garante que o range exibido reflita a seleção mesmo se algo falhar depois
+  (function(){
+    var p1 = inicio.split('-'), p2 = fim.split('-');
+    document.getElementById('calBtnLabel').textContent = p1[2] + '/' + p1[1] + ' – ' + p2[2] + '/' + p2[1];
+  })();
+
+  try { renderExecSummary(inicio, fim); } catch(e) { console.error('[renderAll] execSummary:', e); }
+  try { renderRecommendations(inicio, fim); } catch(e) { console.error('[renderAll] recommendations:', e); }
+  try { renderKPIs(seg, inicio, fim); } catch(e) { console.error('[renderAll] kpis:', e); }
 
   if (seg === 'GERAL') {
     document.getElementById('objSection').style.display = 'block';
     document.getElementById('chartsGrid').style.display = 'none';
-    renderObjCards(inicio, fim);
+    try { renderObjCards(inicio, fim); } catch(e) { console.error('[renderAll] objCards:', e); }
   } else {
     document.getElementById('objSection').style.display = 'none';
     document.getElementById('chartsGrid').style.display = 'grid';
-    renderMainChart(seg, inicio, fim);
-    renderDistribution(inicio, fim);
+    try { renderMainChart(seg, inicio, fim); } catch(e) { console.error('[renderAll] mainChart:', e); }
+    try { renderDistribution(inicio, fim); } catch(e) { console.error('[renderAll] distribution:', e); }
   }
 
-  renderCampanhasTab(inicio, fim);
-  renderDiaTab(inicio, fim);
-  renderFunilTabNew(inicio, fim);
-
-  // Atualiza label do calendário
-  function isoToDayLbl(iso){ var p = iso.split('-'); return p[2] + '/' + p[1]; }
-  document.getElementById('calBtnLabel').textContent = isoToDayLbl(inicio) + ' – ' + isoToDayLbl(fim);
+  try { renderCampanhasTab(inicio, fim); } catch(e) { console.error('[renderAll] campanhas:', e); }
+  try { renderDiaTab(inicio, fim); } catch(e) { console.error('[renderAll] dia:', e); }
+  try { renderFunilTabNew(inicio, fim); } catch(e) { console.error('[renderAll] funil:', e); }
 }
 
 // ─── FILTER BAR ──────────────────────────────────────────────
