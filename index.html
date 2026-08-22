@@ -1302,22 +1302,18 @@ body{
     <div class="exec-stat">
       <div class="exec-stat-label">Receita Atribuída</div>
       <div class="exec-stat-val" id="execReceita">—</div>
-      <div class="exec-stat-delta" id="execReceitaDelta"></div>
     </div>
     <div class="exec-stat">
       <div class="exec-stat-label">ROAS Vendas</div>
       <div class="exec-stat-val" id="execRoas">—</div>
-      <div class="exec-stat-delta" id="execRoasDelta"></div>
     </div>
     <div class="exec-stat">
       <div class="exec-stat-label">Conversas MSG</div>
       <div class="exec-stat-val" id="execConversas">—</div>
-      <div class="exec-stat-delta" id="execConversasDelta"></div>
     </div>
     <div class="exec-stat">
       <div class="exec-stat-label">Investimento</div>
       <div class="exec-stat-val" id="execInvest">—</div>
-      <div class="exec-stat-delta" id="execInvestDelta"></div>
     </div>
   </div>
 </div>
@@ -2140,16 +2136,9 @@ function renderExecSummary(inicio, fim){
   document.getElementById('execHeadline').innerHTML = headline;
 
   document.getElementById('execReceita').textContent = fmtBRLcompact(cur.receita);
-  document.getElementById('execReceitaDelta').innerHTML = execDeltaBadge(cur.receita, prev.receita, 'higher_is_better');
-
   document.getElementById('execRoas').textContent = roas > 0 ? roas.toFixed(1).replace('.',',') + 'x' : '—';
-  document.getElementById('execRoasDelta').innerHTML = execDeltaBadge(roas, roasPrev, 'higher_is_better');
-
   document.getElementById('execConversas').textContent = fmtNum(cur.results_msg);
-  document.getElementById('execConversasDelta').innerHTML = execDeltaBadge(cur.results_msg, prev.results_msg, 'higher_is_better');
-
   document.getElementById('execInvest').textContent = fmtBRLcompact(cur.spend);
-  document.getElementById('execInvestDelta').innerHTML = execDeltaBadge(cur.spend, prev.spend, 'neutral');
 }
 
 // ─── KPIS ────────────────────────────────────────────────────
@@ -3367,7 +3356,7 @@ document.getElementById('btnShare').addEventListener('click', function(){
           if (_temp.inicio < _MIN_ISO) _temp.inicio = _MIN_ISO;
         }
         _temp.step = 0;
-        _drawAll();
+        window.calApply();
       });
     });
   }
