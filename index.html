@@ -2912,7 +2912,7 @@ function renderFunilTabNew(inicio, fim){
 // Agrega por campanha no período — retorna array com métricas úteis
 function campaignsInRange(D, inicio, fim){
   return D.campanhas.map(function(c){
-    var agg = { name: c.nome, funil: c.funil, spend:0, reach:0, impr:0,
+    var agg = { name: c.name, funil: c.funil, spend:0, reach:0, impr:0,
                 results:0, compras:0, receita:0, clicks_wa:0,
                 view_content:0, add_to_cart:0, init_checkout:0, dias:0 };
     c.dias.forEach(function(d){
