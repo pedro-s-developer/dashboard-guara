@@ -520,15 +520,14 @@ body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;pad
     <div class="chart-canvas-wrap" style="height:160px;"><canvas id="chartCPR"></canvas></div>
   </div>
   <div class="chart-card" style="overflow:hidden;">
-    <div class="chart-title">Distribuição do Investimento</div>
-    <div class="chart-sub">Por estágio do funil</div>
-    <div class="chart-canvas-wrap" style="height:180px;max-width:100%;"><canvas id="chartPie"></canvas></div>
-    <div class="pie-legend" style="grid-template-columns:1fr 1fr;margin-top:12px;">
-      <div class="pie-leg-item"><div class="pie-leg-top"><span class="pie-leg-dot" style="background:#1877F2;"></span><span class="pie-leg-label">Fundo VEN</span></div><div class="pie-leg-val" style="color:#1877F2;">R$ 5.514</div><div class="pie-leg-pct">45,8%</div></div>
-      <div class="pie-leg-item"><div class="pie-leg-top"><span class="pie-leg-dot" style="background:#E31E24;"></span><span class="pie-leg-label">Fundo MSG</span></div><div class="pie-leg-val" style="color:#E31E24;">R$ 2.865</div><div class="pie-leg-pct">23,8%</div></div>
-      <div class="pie-leg-item"><div class="pie-leg-top"><span class="pie-leg-dot" style="background:#0077A8;"></span><span class="pie-leg-label">Meio</span></div><div class="pie-leg-val" style="color:#0077A8;">R$ 1.926</div><div class="pie-leg-pct">16,0%</div></div>
-      <div class="pie-leg-item"><div class="pie-leg-top"><span class="pie-leg-dot" style="background:#E08C00;"></span><span class="pie-leg-label">Topo</span></div><div class="pie-leg-val" style="color:#E08C00;">R$ 1.741</div><div class="pie-leg-pct">14,5%</div></div>
+    <div class="chart-title">Onde o orçamento foi investido</div>
+    <div class="chart-sub">Distribuição por estágio do funil</div>
+    <div style="margin:12px 0 8px;">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text4);margin-bottom:4px;">INVESTIMENTO TOTAL</div>
+      <div id="budgetTotal" style="font-size:26px;font-weight:900;font-family:'IBM Plex Mono',monospace;color:var(--text);">R$ —</div>
     </div>
+    <div id="budgetBar" style="display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;margin-bottom:18px;"></div>
+    <div id="budgetList" style="display:flex;flex-direction:column;gap:12px;"></div>
   </div>
 </div>
 
@@ -883,10 +882,10 @@ function renderCampanhasTab(D){
   if(!container) return;
   var CAMPS = D.CAMPS || {};
   var META = {
-    FUNDO_VEN: {badge:'fundo-ven', tag:'FUNDO VEN', title:'Campanha de Venda', color:'#1877F2', resultLbl:'Compras', cprLbl:'C/Compra', extraLbl:'ROAS', extraColor:'var(--green)'},
-    FUNDO_MSG: {badge:'fundo-msg', tag:'FUNDO MSG', title:'Campanha de Mensagem', color:'#E31E24', resultLbl:'Conversas', cprLbl:'C/Conversa', extraLbl:'—', extraColor:'var(--teal)'},
-    MEIO:      {badge:'meio', tag:'MEIO', title:'Campanha de Meio de Funil', color:'#0077A8', resultLbl:'Visitas', cprLbl:'C/Visita', extraLbl:'—', extraColor:'var(--text2)'},
-    TOPO:      {badge:'topo', tag:'TOPO', title:'Campanha de Topo de Funil', color:'#E08C00', resultLbl:'Alcance', cprLbl:'CPM', extraLbl:'—', extraColor:'var(--text2)'}
+    FUNDO_VEN: {badge:'fundo-ven', badgeLbl:'FUNDO — VENDAS',    tag:'FUNDO VEN', title:'Campanha de Venda', color:'#1877F2', resultLbl:'Compras',   cprLbl:'C/Compra',  extraLbl:'ROAS', extraColor:'var(--green)'},
+    FUNDO_MSG: {badge:'fundo-msg', badgeLbl:'FUNDO — MENSAGENS', tag:'FUNDO MSG', title:'Campanha de Mensagem', color:'#E31E24', resultLbl:'Conversas', cprLbl:'C/Conversa', extraLbl:'—', extraColor:'var(--teal)'},
+    MEIO:      {badge:'meio',      badgeLbl:'MEIO — TRÁFEGO',    tag:'MEIO',      title:'Campanha de Meio de Funil', color:'#0077A8', resultLbl:'Visitas',    cprLbl:'C/Visita',  extraLbl:'—', extraColor:'var(--text2)'},
+    TOPO:      {badge:'topo',      badgeLbl:'TOPO — ALCANCE',    tag:'TOPO',      title:'Campanha de Topo de Funil', color:'#E08C00', resultLbl:'Alcance',    cprLbl:'CPM',       extraLbl:'—', extraColor:'var(--text2)'}
   };
   var order = ['FUNDO_VEN','FUNDO_MSG','MEIO','TOPO'];
   var html = order.map(function(seg, idx){
@@ -898,7 +897,7 @@ function renderCampanhasTab(D){
     var totRec = camps.reduce(function(a,c){return a+(c.receita||0);},0);
     var cprAvg = totRes>0 ? totInv/totRes : 0;
     var roasAvg = totInv>0 && seg==='FUNDO_VEN' ? totRec/totInv : null;
-    var subtxt = 'Valor Investido · Resultado · Custo por Resultado';
+    var subtxt = 'R$ '+_fmtN(totInv)+' · '+_fmtNuma(totRes)+' '+m.resultLbl.toLowerCase();
 
     var rows = camps.map(function(c){
       var tag = c.tag ? c.tag.toUpperCase() : m.badge.toUpperCase();
@@ -924,8 +923,8 @@ function renderCampanhasTab(D){
     return '<div class="camp-group'+(idx>0?' collapsed':'')+'">'
       + '<div class="camp-group-head" onclick="toggleGroup(this)">'
       +   '<div class="camp-group-head-left">'
-
-      +     '<div><div class="camp-group-title">'+m.title+' — '+camps.length+' campanha'+(camps.length>1?'s':'')+'</div><div class="camp-group-sub">'+subtxt+'</div></div>'
+      +     '<span class="camp-group-badge '+m.badge+'">'+m.badgeLbl+'</span>'
+      +     '<div><div class="camp-group-title">'+camps.length+' campanha'+(camps.length>1?'s':'')+' ativa'+(camps.length>1?'s':'')+'</div><div class="camp-group-sub">'+subtxt+'</div></div>'
       +   '</div>'
       +   '<span class="camp-group-chevron">▼</span>'
       + '</div>'
@@ -1095,8 +1094,8 @@ var seg='FUNDO_VEN';
 var _receitaMap={};
 var c1=new Chart(document.getElementById('chartInvestRes'),{
   data:{labels:FD[seg].labels,datasets:[
-    {type:'bar',label:'Investido (R$)',data:FD[seg].invest,backgroundColor:'#FEE8E8',borderColor:'#E31E24',borderWidth:0.5,borderRadius:4,yAxisID:'y',order:2},
-    {type:'line',label:FD[seg].result_label,data:FD[seg].results,borderColor:'#E31E24',backgroundColor:'#E31E24',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y1',order:1}
+    {type:'bar',label:'Investido (R$)',data:FD[seg].invest,backgroundColor:'rgba(209,213,219,0.75)',borderColor:'rgba(160,170,185,0.4)',borderWidth:0.5,borderRadius:4,yAxisID:'y',order:2},
+    {type:'line',label:FD[seg].result_label,data:FD[seg].results,borderColor:'#1877F2',backgroundColor:'#1877F2',borderWidth:2,tension:0.3,pointRadius:3,yAxisID:'y1',order:1}
   ]},
   options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:false},tooltip:{...TT,callbacks:{
@@ -1149,12 +1148,32 @@ var centerLabelPlugin={
     ctx.restore();
   }
 };
-var cPie=new Chart(document.getElementById('chartPie'),{
-  type:'doughnut',
-  data:{labels:['Fundo VEN','Fundo MSG','Meio','Topo'],datasets:[{data:[5514.49,2865.15,1925.86,1740.72],backgroundColor:['#1877F2','#E31E24','#0077A8','#E08C00'],borderWidth:0,spacing:3}]},
-  plugins:[centerLabelPlugin],
-  options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:function(ctx){return ctx.label+': R$ '+ctx.parsed.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}}}
-});
+function renderBudgetBar(ven, msg, meio, topo, totInv){
+  var items=[
+    {label:'Fundo Vendas',    color:'#1877F2', val:ven.totInv},
+    {label:'Fundo MSG',       color:'#E31E24', val:msg.totInv},
+    {label:'Topo · Alcance',  color:'#E08C00', val:topo.totInv},
+    {label:'Meio · Tráfego',  color:'#0077A8', val:meio.totInv},
+  ];
+  var totalEl=document.getElementById('budgetTotal');
+  var barEl=document.getElementById('budgetBar');
+  var listEl=document.getElementById('budgetList');
+  if(!totalEl||!barEl||!listEl) return;
+  totalEl.textContent='R$ '+_fmtN(totInv);
+  barEl.innerHTML=items.map(function(it){
+    var pct=totInv>0?(it.val/totInv*100):0;
+    return '<div style="background:'+it.color+';flex:'+pct.toFixed(2)+';border-radius:3px;min-width:'+(pct>0?'4px':'0')+'"></div>';
+  }).join('');
+  listEl.innerHTML=items.map(function(it){
+    var pct=totInv>0?(it.val/totInv*100).toFixed(1):'0,0';
+    return '<div style="display:flex;align-items:center;gap:10px;">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+it.color+';flex-shrink:0;"></div>'
+      +'<span style="flex:1;font-size:12px;color:var(--text2);">'+it.label+'</span>'
+      +'<span style="font-size:12px;font-weight:700;font-family:\'IBM Plex Mono\',monospace;color:var(--text);">R$ '+_fmtN(it.val)+'</span>'
+      +'<span style="font-size:11px;color:var(--text4);font-family:\'IBM Plex Mono\',monospace;min-width:40px;text-align:right;">'+pct+'%</span>'
+      +'</div>';
+  }).join('');
+}
 
 // ── CHART 4: Compras por dia ─────────────────────────────────
 var cCompras=new Chart(document.getElementById('chartCompras'),{
@@ -1202,8 +1221,14 @@ var cMsg=new Chart(document.getElementById('chartMsg'),{
 })();
 
 // ── FILTER ────────────────────────────────────────────────────
-var barColors={FUNDO_VEN:'#FEE8E8',FUNDO_MSG:'#FEE8E8',MEIO:'#CCE8F4',TOPO:'#FFF0CC'};
+var barColors={FUNDO_VEN:'rgba(209,213,219,0.75)',FUNDO_MSG:'rgba(209,213,219,0.75)',MEIO:'rgba(209,213,219,0.75)',TOPO:'rgba(209,213,219,0.75)'};
 var lineColors={FUNDO_VEN:'#1877F2',FUNDO_MSG:'#E31E24',MEIO:'#0077A8',TOPO:'#E08C00'};
+var chartTitleMap={
+  FUNDO_VEN:{title:'Investimento e compras dia a dia',tipo:'vendas'},
+  FUNDO_MSG:{title:'Investimento e conversas dia a dia',tipo:'mensagens'},
+  MEIO:     {title:'Investimento e visitas página dia a dia',tipo:'tráfego ao site'},
+  TOPO:     {title:'Investimento e alcance dia a dia',tipo:'alcance',useReach:true}
+};
 
 // HERO_DATA e GERAL_KPIS são placeholders vazios — são preenchidos dinamicamente em renderRange
 var HERO_DATA={GERAL:{text:'—',stats:[{l:'—',v:'—'},{l:'—',v:'—'},{l:'—',v:'—'}]}};
@@ -1272,8 +1297,10 @@ function applyFilter(s){
     document.getElementById('ks'+i).textContent=k.sub;
   });
   // chart titles
-  document.getElementById('chart1Title').textContent='Evolução — '+sk.legend;
-  document.getElementById('chart1Sub').textContent='Investido diário × '+fd.result_label+' realizadas';
+  var _ct=chartTitleMap[s];
+  var _totRs=s==='TOPO'?fd.kpi.reach:fd.kpi.results;
+  document.getElementById('chart1Title').textContent=_ct.title;
+  document.getElementById('chart1Sub').textContent='R$ '+_fmtN(fd.kpi.invest)+' em '+_ct.tipo+' — '+_fmtN(_totRs)+' '+fd.result_label.toLowerCase();
   document.getElementById('lgResult').textContent=fd.result_label;
   document.getElementById('lgCpr').textContent=fd.cpr_label;
   document.getElementById('cprChartTitle').textContent=fd.cpr_label+' diário';
@@ -1282,8 +1309,8 @@ function applyFilter(s){
   if(s==='FUNDO_VEN'&&fd.receita){fd.labels.forEach(function(lbl,i){_receitaMap[lbl]=fd.receita[i]||0;});}
   c1.data.labels=fd.labels;
   c1.data.datasets[0].data=fd.invest;
-  c1.data.datasets[0].backgroundColor=barColors[s]||'#FEE8E8';
-  c1.data.datasets[0].borderColor=lineColors[s]||'#E31E24';
+  c1.data.datasets[0].backgroundColor='rgba(209,213,219,0.75)';
+  c1.data.datasets[0].borderColor='rgba(160,170,185,0.4)';
   c1.data.datasets[1].data=fd.results;
   c1.data.datasets[1].label=fd.result_label;
   c1.data.datasets[1].borderColor=lineColors[s]||'#E31E24';
@@ -1294,7 +1321,7 @@ function applyFilter(s){
   c2.data.datasets[0].label=fd.cpr_label;
   c2.update();
   // resize charts caso tenham sido ocultados anteriormente
-  setTimeout(function(){c1.resize();c2.resize();if(cPie)cPie.resize();if(cCompras)cCompras.resize();if(cMsg)cMsg.resize();},100);
+  setTimeout(function(){c1.resize();c2.resize();if(cCompras)cCompras.resize();if(cMsg)cMsg.resize();},100);
   updateHero(s);
 }
 
@@ -1448,26 +1475,8 @@ function renderRange(startIso,endIso){
     stats:[{l:'Alcance Total',v:_fmtN(topo.totRes)},{l:'CPM',v:topoCPM},{l:'Investido',v:'R$ '+_fmtN(topo.totInv)}]
   };
 
-  // ── Pie chart update ─────────────────────────────────────
-  if(typeof cPie!=='undefined'&&cPie){
-    cPie._customTotal=totInv;
-    cPie.data.datasets[0].data=[ven.totInv,msg.totInv,meio.totInv,topo.totInv];
-    cPie.update();
-    // Pie legend values
-    var pieItems=document.querySelectorAll('.pie-leg-item');
-    var pSegs=[ven,msg,meio,topo];
-    pieItems.forEach(function(item,i){
-      var sg=pSegs[i];
-      var pct=totInv>0?(sg.totInv/totInv*100).toFixed(1)+'%':'—';
-      var vEl=item.querySelector('.pie-leg-val');
-      var pEl=item.querySelector('.pie-leg-pct');
-      if(vEl) vEl.textContent='R$ '+_fmtN(sg.totInv);
-      if(pEl) pEl.textContent=pct;
-    });
-    // Pie subtitle
-    var pSub=document.querySelector('.chart-card:nth-child(2) .chart-sub');
-    if(pSub) pSub.textContent='Por estágio do funil · R$ '+_fmtN(totInv)+' total';
-  }
+  // ── Budget bar update ─────────────────────────────────────
+  renderBudgetBar(ven, msg, meio, topo, totInv);
 
   // ── Day table rebuild ─────────────────────────────────────
   var daily=agg.daily;
