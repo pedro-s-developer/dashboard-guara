@@ -718,6 +718,8 @@ function _buildSegFD(seg, byDate, dates){
     } else if(seg === 'FUNDO_VEN'){
       var comp = b.compras || b.results;
       r = comp; c = comp>0 ? s/comp : 0;
+    } else if(seg === 'MEIO'){
+      r = b.view_content || b.results; c = r>0 ? s/r : 0;
     } else {
       r = b.results; c = r>0 ? s/r : 0;
     }
