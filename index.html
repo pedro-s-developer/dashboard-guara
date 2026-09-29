@@ -869,10 +869,12 @@ function renderObjCards(D, inicio, fim){
         a.receita       += d.receita||0;
         a.view_content  += d.view_content||0;
         a.init_checkout += d.init_checkout||0;
+      } else if(c.funil==='MEIO'){
+        a.results += d.view_content||d.results||0;
+        a.clicks  += d.clicks_wa||0;
       } else {
         a.results += d.results||0;
         if(c.funil==='FUNDO_MSG') a.clicks_wa += d.clicks_wa||0;
-        if(c.funil==='MEIO')      a.clicks    += d.results||0;
       }
     });
   });
