@@ -18,6 +18,7 @@
   --teal:#0077A8;--teal-bg:#E0F4FA;
   --purple:#E31E24;--purple-bg:#FEE8E8;
   --red:#C0392B;--red-bg:#FEF0EF;
+  --cadastro:#00934a;--cadastro-bg:#E6F5EE;
 }
 [data-theme="dark"]{
   color-scheme: dark;
@@ -29,6 +30,7 @@
   --teal:#2CB4D9;--teal-bg:#0A2A34;
   --purple:#FF5A5F;--purple-bg:#3A0F12;
   --red:#E74C3C;--red-bg:#3A0F0B;
+  --cadastro:#2ECC71;--cadastro-bg:#0E2A1A;
 }
 [data-theme="dark"] body{color:var(--text) !important;-webkit-text-fill-color:var(--text);}
 [data-theme="dark"] .h-title{color:var(--text) !important;-webkit-text-fill-color:var(--text) !important;}
@@ -887,7 +889,8 @@ function renderObjCards(D, inicio, fim){
     TOPO:      {n:0, n_ativas:0, spend:0, reach:0, impr:0, results:0},
     MEIO:      {n:0, n_ativas:0, spend:0, results:0, impr:0, clicks:0},
     FUNDO_MSG: {n:0, n_ativas:0, spend:0, results:0, reach:0, clicks_wa:0},
-    FUNDO_VEN: {n:0, n_ativas:0, spend:0, results:0, receita:0, view_content:0, init_checkout:0}
+    FUNDO_VEN: {n:0, n_ativas:0, spend:0, results:0, receita:0, view_content:0, init_checkout:0},
+    FUNDO_LEAD:{n:0, n_ativas:0, spend:0, reach:0, impr:0, leads:0, visitas:0, cliques:0}
   };
   D.campanhas.forEach(function(c){
     var a = AGG[c.funil]; if(!a) return;
@@ -910,6 +913,10 @@ function renderObjCards(D, inicio, fim){
       } else if(c.funil==='MEIO'){
         a.results += d.view_content||d.results||0;
         a.clicks  += d.clicks_wa||0;
+      } else if(c.funil==='FUNDO_LEAD'){
+        a.leads   += d.leads||0;
+        a.visitas += d.view_content||0;
+        a.cliques += d.clicks_wa||0;
       } else {
         a.results += d.results||0;
         if(c.funil==='FUNDO_MSG') a.clicks_wa += d.clicks_wa||0;
@@ -917,7 +924,7 @@ function renderObjCards(D, inicio, fim){
     });
   });
 
-  var totInv = AGG.TOPO.spend + AGG.MEIO.spend + AGG.FUNDO_MSG.spend + AGG.FUNDO_VEN.spend;
+  var totInv = AGG.TOPO.spend + AGG.MEIO.spend + AGG.FUNDO_MSG.spend + AGG.FUNDO_VEN.spend + AGG.FUNDO_LEAD.spend;
   var nDays  = Math.round((new Date(fim+'T00:00:00') - new Date(inicio+'T00:00:00')) / 86400000) + 1;
 
   // SVG Icons
@@ -944,10 +951,18 @@ function renderObjCards(D, inicio, fim){
   if(g.n>0) data.msg = {camps:g.n, camps_ativas:g.n_ativas, spend:g.spend, conversas:g.results, cpl:(g.results>0?g.spend/g.results:0), cliques_wa:g.clicks_wa, reach:g.reach, dias:nDays};
   var v = AGG.FUNDO_VEN;
   if(v.n>0) data.vendas = {camps:v.n, camps_ativas:v.n_ativas, spend:v.spend, compras:v.results, receita:v.receita, roas:(v.spend>0?v.receita/v.spend:0), cpa:(v.results>0?v.spend/v.results:0), page_views:v.view_content, checkouts:v.init_checkout};
+  var cd = AGG.FUNDO_LEAD;
+  if(cd.n>0) data.cadastro = {
+    camps:cd.n, camps_ativas:cd.n_ativas,
+    spend:cd.spend, leads:cd.leads,
+    cpl:(cd.leads>0?cd.spend/cd.leads:0),
+    visitas:cd.visitas, cliques:cd.cliques, impr:cd.impr, reach:cd.reach,
+    dias:nDays
+  };
 
   // Layout: 1 diag + 1 obj -> side by side in a single diag-grid row
   var nDiag = (data.topo?1:0) + (data.meio?1:0);
-  var nObj  = (data.msg?1:0)  + (data.vendas?1:0);
+  var nObj  = (data.msg?1:0)  + (data.vendas?1:0) + (data.cadastro?1:0);
   var singleRow = (nDiag === 1 && nObj === 1);
 
   // Card builders
@@ -998,6 +1013,25 @@ function renderObjCards(D, inicio, fim){
       +'</div></div>';
   }
 
+  function _cadastroCard(cd){
+    var mpd = cd.dias>0 ? cd.leads/cd.dias : 0;
+    return '<div class="obj-card cadastro">'
+      +'<div class="obj-header"><div class="obj-title-block"><div class="obj-icon" style="background:var(--cadastro-bg);color:var(--cadastro);">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'
+      +'</div>'
+      +'<div><div class="obj-label">Cadastros</div><div class="obj-camp-count">'+_fN(cd.leads)+' cadastros gerados</div></div></div>'
+      +'<div class="obj-spend-badge">'+_fB(cd.spend,0)+'</div></div>'
+      +'<div class="obj-body">'
+      +'<div><div class="obj-metric-label">Cadastros</div><div class="obj-metric-val" style="color:var(--cadastro);">'+_fN(cd.leads)+'</div><div class="obj-metric-sub">'+Math.round(mpd)+'/dia em média</div></div>'
+      +'<div><div class="obj-metric-label">CPL</div><div class="obj-metric-val">'+_fB(cd.cpl)+'</div><div class="obj-metric-sub">custo por cadastro</div></div>'
+      +'</div>'
+      +'<div class="obj-footer">'
+      +'<div><div class="obj-foot-label">Alcance</div><div class="obj-foot-val">'+_fNc(cd.reach)+'</div></div>'
+      +'<div><div class="obj-foot-label">Cliques</div><div class="obj-foot-val">'+_fNc(cd.cliques)+'</div></div>'
+      +'<div><div class="obj-foot-label">Visitas página</div><div class="obj-foot-val">'+_fNc(cd.visitas)+'</div></div>'
+      +'</div></div>';
+  }
+
   function _venCard(vd){
     return '<div class="obj-card ven">'
       +'<div class="obj-header"><div class="obj-title-block"><div class="obj-icon ven">'+_IC.cart+'</div>'
@@ -1019,10 +1053,11 @@ function renderObjCards(D, inicio, fim){
   if(singleRow){
     // 1 diag + 1 obj: side by side in one row
     html += '<div class="diag-grid">';
-    if(data.topo)   html += _topoCard(data.topo);
-    if(data.meio)   html += _meioCard(data.meio);
-    if(data.msg)    html += _msgCard(data.msg);
-    if(data.vendas) html += _venCard(data.vendas);
+    if(data.topo)     html += _topoCard(data.topo);
+    if(data.meio)     html += _meioCard(data.meio);
+    if(data.msg)      html += _msgCard(data.msg);
+    if(data.vendas)   html += _venCard(data.vendas);
+    if(data.cadastro) html += _cadastroCard(data.cadastro);
     html += '</div>';
   } else {
     if(data.topo||data.meio){
@@ -1031,10 +1066,11 @@ function renderObjCards(D, inicio, fim){
       if(data.meio) html += _meioCard(data.meio);
       html += '</div>';
     }
-    if(data.msg||data.vendas){
+    if(data.msg||data.vendas||data.cadastro){
       html += '<div class="obj-grid">';
-      if(data.msg)    html += _msgCard(data.msg);
-      if(data.vendas) html += _venCard(data.vendas);
+      if(data.msg)      html += _msgCard(data.msg);
+      if(data.vendas)   html += _venCard(data.vendas);
+      if(data.cadastro) html += _cadastroCard(data.cadastro);
       html += '</div>';
     }
   }
